@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  mineia-db:
+    image: postgres:15-alpine
+    container_name: mineia-v1-db
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mineia
+    ports:
+      - "5432:5432"
+    volumes:
+      - mineia_postgres_data:/var/lib/postgresql/data
+
+  mineia-app:
+    build: .
+    container_name: mineia-v1-app
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://user:password@mineia-db:5432/mineia?schema=public"
+      NEXTAUTH_URL: "http://localhost:3000"
+      NEXTAUTH_SECRET: "replace-with-secure-secret"
+    depends_on:
+      - mineia-db
+
+volumes:
+  mineia_postgres_data:

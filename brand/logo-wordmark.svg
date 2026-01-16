@@ -1,0 +1,11 @@
+<svg width="300" height="80" viewBox="0 0 300 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Symbol: Abstract Lead/Data Flow -->
+  <path d="M40 20L20 40L40 60" stroke="#22D3EE" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M50 20L70 40L50 60" stroke="#A3E635" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Text: MINEIA -->
+  <text x="90" y="55" font-family="'Inter', sans-serif" font-weight="700" font-size="42" fill="#F8FAFC" letter-spacing="-1">MINEIA</text>
+  
+  <!-- Accent Dot -->
+  <circle cx="260" cy="55" r="4" fill="#22D3EE"/>
+</svg>

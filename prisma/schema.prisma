@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  SDR
+}
+
+enum LeadStatus {
+  P0
+  P1
+  P2
+  DISCARD
+  DNC
+}
+
+enum Contactability {
+  WHATSAPP_FOUND
+  PLATFORM_CHAT_ONLY
+  NO_CONTACT
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+model User {
+  id            String       @id @default(cuid())
+  name          String?
+  email         String?      @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?      // Hashed password for Credentials provider
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  memberships   Membership[]
+  leadEvents    LeadEvent[]
+  assignedLeads Lead[]       @relation("AssignedTo")
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Workspace {
+  id          String             @id @default(cuid())
+  name        String
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  memberships Membership[]
+  settings    WorkspaceSettings?
+  integrations Integration[]
+  leads       Lead[]
+  apiKeys     WorkspaceApiKey[]
+  jobs        Job[]
+}
+
+model Membership {
+  id          String    @id @default(cuid())
+  role        Role      @default(SDR)
+  userId      String
+  workspaceId String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workspaceId])
+}
+
+model WorkspaceSettings {
+  id               String    @id @default(cuid())
+  workspaceId      String    @unique
+  geographyJson    Json?     // List of states/cities
+  keywordsJson     Json?     // Interest keywords
+  targetModelsJson Json?     // Car models list
+  thresholdsJson   Json?     // Scoring thresholds
+  dryRun          Boolean    @default(true)
+  workspace        Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model Integration {
+  id          String   @id @default(cuid())
+  type        String   // e.g. "N8N", "WHATSAPP"
+  configJson  Json?
+  isEnabled   Boolean  @default(true)
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model WorkspaceApiKey {
+  id          String    @id @default(cuid())
+  hashedKey   String    @unique
+  name        String?
+  lastUsedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model Lead {
+  id             String         @id @default(cuid())
+  leadHash       String         // Unique identifier for the lead in external source (e.g. ad id)
+  source         String         // e.g. "OLX", "Webmotors"
+  url            String?
+  title          String?
+  description    String?
+  price          Float?
+  city           String?
+  state          String?
+  publishedAt    DateTime?
+  contactability Contactability @default(PLATFORM_CHAT_ONLY)
+  contactValue   String?        // Phone number or profile link
+  scoresJson     Json?          // { debt: 0.8, urgency: 0.5, risk: 0.2 }
+  aiJson         Json?          // AI Analysis: reasons list, summary
+  priority       String         @default("P2") // P0, P1, P2
+  status         LeadStatus     @default(P2)
+  assignedToUserId String?
+  assignedTo     User?          @relation("AssignedTo", fields: [assignedToUserId], references: [id])
+  workspaceId    String
+  workspace      Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  events         LeadEvent[]
+
+  @@unique([workspaceId, leadHash])
+}
+
+model LeadEvent {
+  id          String    @id @default(cuid())
+  type        String    // e.g. "STATUS_CHANGE", "SDR_CONTACT", "DNC_MARKED"
+  payloadJson Json?
+  createdAt   DateTime  @default(now())
+  leadId      String
+  lead        Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id])
+}
+
+model DncEntry {
+  id           String   @id @default(cuid())
+  contactValue String   @unique // The phone number or identifier blocked
+  reason       String?
+  createdAt    DateTime @default(now())
+  workspaceId  String
+  // DNC is usually workspace specific, but can be global if needed. Let's keep workspaceId for now.
+}
+
+model Job {
+  id          String    @id @default(cuid())
+  source      String
+  status      JobStatus @default(PENDING)
+  statsJson   Json?     // { processed: 10, inserted: 5, duplicates: 5 }
+  startedAt   DateTime  @default(now())
+  finishedAt  DateTime?
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+// NextAuth models
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
