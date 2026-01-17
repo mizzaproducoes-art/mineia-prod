@@ -76,15 +76,58 @@ export default function LandingPage() {
               </div>
 
               {/* Dashboard Preview */}
-              <div className="mt-16 relative w-full max-w-5xl mx-auto rounded-xl border border-white/10 shadow-2xl bg-[#0F172A]/50 backdrop-blur-sm p-2 overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-                <div className="rounded-lg overflow-hidden border border-white/5 bg-[#020617] h-[300px] md:h-[500px] flex items-center justify-center text-slate-700 font-mono text-sm relative">
-                  <div className="absolute top-4 left-4 flex gap-2">
-                    <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50" />
-                    <div className="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50" />
+              <div className="mt-16 relative w-full max-w-5xl mx-auto rounded-xl border border-white/10 shadow-2xl bg-surface/50 backdrop-blur-sm p-3 overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                <div className="rounded-lg overflow-hidden border border-white/5 bg-background h-[300px] md:h-[550px] relative">
+                  {/* Browser Bar */}
+                  <div className="h-10 border-b border-white/5 bg-surface/80 flex items-center px-4 gap-2">
+                    <div className="flex gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-red-500/20 border border-red-500/40" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/20 border border-yellow-500/40" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-green-500/20 border border-green-500/40" />
+                    </div>
+                    <div className="flex-1 max-w-sm mx-auto h-5 bg-background/50 rounded-md border border-white/5" />
                   </div>
-                  <span className="opacity-50">[Dashboard Preview Placeholder]</span>
+                  
+                  {/* Mockup Dashboard Content */}
+                  <div className="p-6 flex gap-6 h-full">
+                    {/* Mock Sidebar */}
+                    <div className="w-48 hidden md:block space-y-3">
+                      <div className="h-8 w-full bg-primary/5 rounded-lg border border-primary/10" />
+                      <div className="space-y-1">
+                        {[1, 2, 3, 4, 5].map(i => (
+                          <div key={i} className="h-4 w-full bg-white/5 rounded-md" />
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Mock Main Content */}
+                    <div className="flex-1 space-y-6">
+                      <div className="grid grid-cols-3 gap-4">
+                        {[1, 2, 3].map(i => (
+                          <div key={i} className="h-24 bg-surface rounded-xl border border-white/5 flex flex-col justify-center px-4">
+                             <div className="h-2 w-12 bg-white/10 rounded mb-2" />
+                             <div className="h-4 w-16 bg-primary/20 rounded" />
+                          </div>
+                        ))}
+                      </div>
+                      <div className="h-64 bg-surface rounded-xl border border-white/5 p-4">
+                         <div className="h-4 w-32 bg-white/10 rounded mb-4" />
+                         <div className="space-y-3">
+                           {[1, 2, 3, 4].map(i => (
+                             <div key={i} className="flex items-center gap-4">
+                               <div className="h-8 w-8 bg-white/5 rounded-full" />
+                               <div className="h-2 flex-1 bg-white/5 rounded" />
+                               <div className="h-4 w-12 bg-accent/20 rounded-full" />
+                             </div>
+                           ))}
+                         </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Overlay Gradient for "Depth" */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent pointer-events-none" />
                 </div>
               </div>
             </div>
