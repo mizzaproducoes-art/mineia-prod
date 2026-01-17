@@ -3,9 +3,9 @@ import { prisma } from "@/lib/db";
 
 export async function POST(
   req: Request,
-  props: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const params = await props.params;
+  const { id } = await params;
   const apiKeyHeader = req.headers.get("Authorization");
 
   if (!apiKeyHeader || !apiKeyHeader.startsWith("Bearer ")) {
@@ -22,7 +22,6 @@ export async function POST(
     return NextResponse.json({ error: "Invalid API Key" }, { status: 401 });
   }
 
-  const { id } = params;
 
   try {
     const body = await req.json();

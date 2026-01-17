@@ -17,10 +17,9 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function LeadDetailPage(props: PageProps) {
+export default async function LeadDetailPage({ params }: PageProps) {
   const session = await getServerSession(authOptions);
-  const params = await props.params;
-  const { id } = params;
+  const { id } = await params;
 
   const lead = await prisma.lead.findUnique({
     where: { id },
@@ -146,7 +145,7 @@ export default async function LeadDetailPage(props: PageProps) {
             Histórico de Eventos
           </h3>
           <div className="space-y-8 pl-2">
-            {lead.events.map((event) => (
+            {lead.events.map((event: any) => (
               <div key={event.id} className="relative pl-8 border-l border-border last:border-0 group">
                 <div className="absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full bg-background border border-primary group-hover:bg-primary group-hover:shadow-[0_0_10px_rgba(34,211,238,0.5)] transition-all" />
                 <p className="text-xs font-bold uppercase text-primary tracking-wide mb-1 opacity-80 group-hover:opacity-100">{event.type}</p>

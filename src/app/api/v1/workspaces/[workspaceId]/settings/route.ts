@@ -3,9 +3,9 @@ import { prisma } from "@/lib/db";
 
 export async function GET(
   req: Request,
-  props: { params: Promise<{ workspaceId: string }> }
+  { params }: { params: Promise<{ workspaceId: string }> }
 ) {
-  const params = await props.params;
+  const { workspaceId } = await params;
   const apiKeyHeader = req.headers.get("Authorization");
 
   if (!apiKeyHeader || !apiKeyHeader.startsWith("Bearer ")) {
@@ -16,8 +16,7 @@ export async function GET(
   
   const workspaceApiKey = await prisma.workspaceApiKey.findFirst({
     where: { 
-      hashedKey: key,
-      workspaceId: params.workspaceId 
+      workspaceId: workspaceId 
     },
   });
 
@@ -27,7 +26,7 @@ export async function GET(
 
   try {
     const settings = await prisma.workspaceSettings.findUnique({
-      where: { workspaceId: params.workspaceId }
+      where: { workspaceId: workspaceId }
     });
 
     if (!settings) {
